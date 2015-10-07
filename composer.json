@@ -1,0 +1,19 @@
+{
+  "name": "tippingcanoe/mockingjay",
+  "description": "Platform agnostic, annotation-based, self-mocking POPOs",
+  "authors": [
+    {
+      "name": "Iain Connor",
+      "email": "i.connor@tippingcanoe.com"
+    }
+  ],
+  "require": {
+    "doctrine/common": "2.5.1",
+    "fzaninotto/faker": "1.5.0"
+  },
+  "autoload": {
+    "psr-0": {
+      "TippingCanoe\\MockingJay\\": "src/"
+    }
+  }
+}
