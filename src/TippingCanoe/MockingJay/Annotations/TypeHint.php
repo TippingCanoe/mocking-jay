@@ -1,17 +1,20 @@
 <?php
 namespace TippingCanoe\MockingJay\Annotations;
 
-
-use Faker\Factory;
-
-
 /**
  * Class TypeHint
  *
- * @package TippingCanoe\Apiarian\Annotations
+ * @package TippingCanoe\MockingJay\Annotations
  */
 class TypeHint {
 
+	public static $arrayType = 'array';
+
+	/**
+	 * Map of possible names to a sanitized version.
+	 *
+	 * @var array
+	 */
 	private static $basicTypes = [
 		'string' => 'string',
 		'int' => 'int',
@@ -20,8 +23,6 @@ class TypeHint {
 		'bool' => 'bool',
 		'boolean' => 'bool'
 	];
-
-	private static $arrayType = 'array';
 
 	private static $arrayTypeShort = '[]';
 
@@ -41,19 +42,27 @@ class TypeHint {
 		$this->genericType = $genericType;
 	}
 
-
+	/**
+	 * Sanitizes the given type into a known value, if possible, handling checking for arrays.
+	 *
+	 * @param $type
+	 * @param array $imports
+	 * @return bool|TypeHint
+	 */
 	public static function parse($type, array $imports) {
-
 		$typeInfo = explode(" ", $type);
 
-		$baseType = $typeInfo[0];
+		$baseType = trim($typeInfo[0]);
 		if (false !== $sanitizedBaseType = TypeHint::getSanitizedName($baseType, $imports)) {
 			if ($sanitizedBaseType == TypeHint::$arrayType) {
 				$genericType = null;
+				// Check for [] and <> and array.
 				if (substr($baseType, -2) == TypeHint::$arrayTypeShort) {
-					$genericType = substr($baseType, 0, -2);
+					$genericType = trim(substr($baseType, 0, -2));
+				} else if (preg_match("/array(?:.*?)<(.*?)>/", $type, $matches)) {
+					$genericType = trim($matches[1]);
 				} else {
-					$genericType = $typeInfo[1];
+					$genericType = trim($typeInfo[1]);
 				}
 
 				if (false !== $sanitizedGenericType = TypeHint::getSanitizedName($genericType, $imports)) {
@@ -69,13 +78,21 @@ class TypeHint {
 		return false;
 	}
 
+	/**
+	 * Sanitizes the given type string into a known value, if possible.
+	 *
+	 * @param $string
+	 * @param array $imports
+	 * @return bool|string
+	 */
 	private static function getSanitizedName($string, array $imports) {
-
 		if (array_key_exists($string, TypeHint::$basicTypes)) {
 			return TypeHint::$basicTypes[$string];
 		} else if ($string == TypeHint::$arrayType) {
 			return TypeHint::$arrayType;
 		} else if (substr($string, -2) == TypeHint::$arrayTypeShort) {
+			return TypeHint::$arrayType;
+		} else if (preg_match("/array<(.*?)>/", $string, $matches)) {
 			return TypeHint::$arrayType;
 		} else if (class_exists($string, false)) {
 			return $string;
@@ -90,14 +107,5 @@ class TypeHint {
 		}
 
 		return false;
-	}
-
-	public function mock(Factory $faker) {
-
-		if (array_key_exists($this->baseType, TypeHint::$basicTypes)) {
-			return $this->mock($this->baseType, $faker);
-		}
-
-		// @TODO, need ot handle arrays and objects, passing onto their fakers recursively. Probalyb move this back up.
 	}
 }

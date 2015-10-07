@@ -142,7 +142,7 @@ class BasicAnnotationReader implements Reader {
 			}
 		}
 
-		AnnotationRegistry::registerFile(Apiarian::getVendorRoot() . '/doctrine/annotations/lib/Doctrine/Common/Annotations/Annotation/IgnoreAnnotation.php');
+		AnnotationRegistry::registerFile(Mockingjay::getVendorRoot() . '/doctrine/annotations/lib/Doctrine/Common/Annotations/Annotation/IgnoreAnnotation.php');
 
 		$this->parser = new DocParser;
 		$this->preParser = new DocParser;
@@ -211,7 +211,7 @@ class BasicAnnotationReader implements Reader {
 
 		$results = $this->parser->parse($propertyComment, $context);
 
-		if (false !== strpos($propertyComment, '@var') && preg_match('/@var\s+([^\s]+)/', $propertyComment, $matches)) {
+		if (false !== strpos($propertyComment, '@var') && preg_match('/@var\s+(.*+)/', $propertyComment, $matches)) {
 			if (false !== $typeHint = TypeHint::parse($matches[1], $propertyImports)) {
 				$results[] = $typeHint;
 			}
