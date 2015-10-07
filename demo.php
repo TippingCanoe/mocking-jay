@@ -104,4 +104,5 @@ class Bar {
 	public $ipsum;
 }
 
+// Mock an instance of `Foo` and dump it out.
 var_dump(\TippingCanoe\MockingJay\MockingJay::mock("Foo"));
